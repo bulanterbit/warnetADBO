@@ -1,0 +1,117 @@
+@token_operator = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzQ5NzEzMTcyLCJleHAiOjE3NDk3OTk1NzJ9.WFlEODtBF4lwjZPsZfsOrHxoske-Nq6srM8bUSma2Ik
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ5NzEyMjc4LCJleHAiOjE3NDk3OTg2Nzh9.dzd7SYayTmuTucZEOKeRnQP_I58mouKk1YALw0U8XZQ
+
+### REGISTER PELANGGAN BARU
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "pelanggan1",
+  "password": "password123",
+  "nama": "Pelanggan Satu"
+}
+
+### REGISTER operator BARU
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "operator1",
+  "password": "operator123",
+  "nama": "operator Satu"
+}
+
+
+### LOGIN
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "pelanggan1",
+  "password": "password123"
+}
+### LOGIN OPERATOR
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "operator1",
+  "password": "operator123"
+}
+### GET PROFIL SAYA (Pelanggan/Operator, butuh token)
+GET http://localhost:5000/api/pengguna/profil
+Authorization: Bearer {{token}}
+
+### TOP UP SALDO (Operator Only)
+POST http://localhost:5000/api/pengguna/1/topup
+Authorization: Bearer {{token_operator}}
+Content-Type: application/json
+
+{
+  "jumlah": 10000
+}
+
+### GET SEMUA JENIS KOMPUTER (Operator Only)
+GET http://localhost:5000/api/komputer/jenis
+Authorization: Bearer {{token_operator}}
+
+### TAMBAH JENIS KOMPUTER (Operator Only)
+POST http://localhost:5000/api/komputer/jenis
+Authorization: Bearer {{token_operator}}
+Content-Type: application/json
+
+{
+  "nama": "PC Standar",
+  "tarifPerMenit": 500
+}
+
+### GET SEMUA KOMPUTER (Operator Only)
+GET http://localhost:5000/api/komputer
+Authorization: Bearer {{token_operator}}
+
+### TAMBAH KOMPUTER (Operator Only)
+POST http://localhost:5000/api/komputer
+Authorization: Bearer {{token_operator}}
+Content-Type: application/json
+
+{
+  "nama": "PC-03",
+  "jenisId": 1
+}
+
+### UPDATE STATUS KOMPUTER (Operator Only)
+PUT http://localhost:5000/api/komputer/1/status
+Authorization: Bearer {{token_operator}}
+Content-Type: application/json
+
+{
+  "status": "Tersedia"
+}
+
+### MULAI SESI (Operator Only)
+POST http://localhost:5000/api/sesi/mulai
+Authorization: Bearer {{token_operator}}
+Content-Type: application/json
+
+{
+  "idPelanggan": 1,
+  "idKomputer": 1
+}
+
+### STOP SESI (Operator Only)
+POST http://localhost:5000/api/sesi/stop
+Authorization: Bearer {{token_operator}}
+Content-Type: application/json
+
+{
+  "idSesi": 1
+}
+
+### GENERATE LAPORAN HARIAN (Operator Only)
+POST http://localhost:5000/api/laporan/harian
+Authorization: Bearer {{token_operator}}
+Content-Type: application/json
+
+{
+  "tanggal": "2025-06-12"
+}
