@@ -1,3 +1,5 @@
+###cara dapat token dan token_operator = login dulu nanti di response ada token
+
 @token_operator = //input token operator
 @token = //input token pelanggan
 
