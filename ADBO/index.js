@@ -9,6 +9,8 @@ import sesiRoutes from "./routes/sesi.route.js";
 import laporanRoutes from "./routes/laporan.route.js";
 import JenisKomputer from './models/JenisKomputer.model.js';
 import Komputer from './models/Komputer.model.js';
+import Sesi from './models/Sesi.model.js';
+import Pengguna from './models/Pengguna.model.js';
 
 // Load environment variables
 dotenv.config();
@@ -31,6 +33,10 @@ app.get("/", (req, res) => {
 // Definisikan relasi
 JenisKomputer.hasMany(Komputer, { foreignKey: 'jenisId' });
 Komputer.belongsTo(JenisKomputer, { foreignKey: 'jenisId' });
+Komputer.hasMany(Sesi, { foreignKey: 'komputerId' });
+Sesi.belongsTo(Komputer, { foreignKey: 'komputerId' });
+Pengguna.hasMany(Sesi, { foreignKey: 'penggunaId' });
+Sesi.belongsTo(Pengguna, { foreignKey: 'penggunaId' });
 
 // Jalankan koneksi database sebelum server listen
 connectDB()

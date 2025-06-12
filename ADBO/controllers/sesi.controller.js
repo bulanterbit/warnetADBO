@@ -59,6 +59,9 @@ export const stopSesi = async (req, res) => {
     const totalBiaya = durasiMenit * sesi.Komputer.JenisKomputer.tarifPerMenit;
 
     const pelanggan = await Pengguna.findByPk(sesi.penggunaId);
+    if (!pelanggan) {
+      return res.status(404).json({ message: "Pelanggan tidak ditemukan" });
+    }
     await pelanggan.decrement('saldo', { by: totalBiaya });
 
     await Transaksi.create({

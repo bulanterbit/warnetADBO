@@ -1,7 +1,7 @@
 ###cara dapat token dan token_operator = login dulu nanti di response ada token
 
-@token_operator = //input token operator
-@token = //input token pelanggan
+@token_operator = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzQ5NzIxMDk3LCJleHAiOjE3NDk4MDc0OTd9.ux8GqQHQIZwdyAiiHlbZ_VZgJyRwMtkOLYdFBd2qhwE
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzQ5NzIwMzE0LCJleHAiOjE3NDk4MDY3MTR9.iJ7DsKev4XLaOXc-uZk22pWiSH4hMI-M9TRn6OuXI0c
 
 ### REGISTER PELANGGAN BARU
 POST http://localhost:5000/api/auth/register
@@ -64,8 +64,8 @@ Authorization: Bearer {{token_operator}}
 Content-Type: application/json
 
 {
-  "nama": "PC Standar",
-  "tarifPerMenit": 500
+  "nama": "PC Gaming Pro",
+  "tarifPerMenit": 700
 }
 
 ### GET SEMUA KOMPUTER (Operator Only)
@@ -78,12 +78,12 @@ Authorization: Bearer {{token_operator}}
 Content-Type: application/json
 
 {
-  "nama": "PC-03",
-  "jenisId": 1
+  "nama": "PC-01",
+  "jenisId": 5
 }
 
 ### UPDATE STATUS KOMPUTER (Operator Only)
-PUT http://localhost:5000/api/komputer/1/status
+PUT http://localhost:5000/api/komputer/7/status
 Authorization: Bearer {{token_operator}}
 Content-Type: application/json
 
@@ -98,7 +98,7 @@ Content-Type: application/json
 
 {
   "idPelanggan": 1,
-  "idKomputer": 1
+  "idKomputer": 8
 }
 
 ### STOP SESI (Operator Only)
@@ -107,7 +107,7 @@ Authorization: Bearer {{token_operator}}
 Content-Type: application/json
 
 {
-  "idSesi": 1
+  "idSesi": 4
 }
 
 ### GENERATE LAPORAN HARIAN (Operator Only)
