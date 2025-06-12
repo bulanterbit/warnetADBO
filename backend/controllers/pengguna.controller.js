@@ -1,5 +1,5 @@
-import Komputer from '../models/Komputer.model.js';
-import JenisKomputer from '../models/JenisKomputer.model.js';
+import Komputer from "../models/Komputer.model.js";
+import JenisKomputer from "../models/JenisKomputer.model.js";
 
 // --- Manajemen Jenis Komputer ---
 export const tambahJenisKomputer = async (req, res) => {
@@ -8,7 +8,7 @@ export const tambahJenisKomputer = async (req, res) => {
     const jenisBaru = await JenisKomputer.create({ nama, tarifPerMenit });
     res.status(201).json(jenisBaru);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -17,7 +17,7 @@ export const getAllJenisKomputer = async (req, res) => {
     const semuaJenis = await JenisKomputer.findAll();
     res.status(200).json(semuaJenis);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -28,7 +28,7 @@ export const tambahKomputer = async (req, res) => {
     const komputerBaru = await Komputer.create({ nama, jenisId });
     res.status(201).json(komputerBaru);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -37,12 +37,12 @@ export const getAllKomputer = async (req, res) => {
     const semuaKomputer = await Komputer.findAll({
       include: {
         model: JenisKomputer,
-        attributes: ['nama', 'tarifPerMenit'],
+        attributes: ["nama", "tarifPerMenit"],
       },
     });
     res.status(200).json(semuaKomputer);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -51,12 +51,12 @@ export const updateStatusKomputer = async (req, res) => {
     const { status } = req.body; // status: "Tersedia", "Digunakan", "Perbaikan"
     const komputer = await Komputer.findByPk(req.params.id);
     if (!komputer) {
-      return res.status(404).json({ message: 'Komputer tidak ditemukan' });
+      return res.status(404).json({ message: "Komputer tidak ditemukan" });
     }
     await komputer.update({ status });
     res.status(200).json(komputer);
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -64,7 +64,7 @@ export const getProfilSaya = async (req, res) => {
   try {
     // req.pengguna di-set oleh middleware protect
     if (!req.pengguna) {
-      return res.status(401).json({ message: 'Tidak ada data pengguna' });
+      return res.status(401).json({ message: "Tidak ada data pengguna" });
     }
     res.json({
       id: req.pengguna.id,
@@ -74,7 +74,7 @@ export const getProfilSaya = async (req, res) => {
       saldo: req.pengguna.saldo,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error: error.message });
+    res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -87,11 +87,11 @@ export const topUpSaldo = async (req, res) => {
       return res.status(404).json({ message: "Pengguna tidak ditemukan" });
     }
 
-    await pengguna.increment('saldo', { by: jumlah });
+    await pengguna.increment("saldo", { by: jumlah });
 
     res.status(200).json({
       message: `Saldo berhasil ditambah sebesar ${jumlah}`,
-      saldoBaru: pengguna.saldo + Number(jumlah)
+      saldoBaru: pengguna.saldo + Number(jumlah),
     });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
