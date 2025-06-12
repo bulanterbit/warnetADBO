@@ -1,3 +1,5 @@
+// warnetADBO/backend/index.js
+
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -7,10 +9,12 @@ import penggunaRoutes from "./routes/pengguna.route.js";
 import komputerRoutes from "./routes/komputer.routes.js";
 import sesiRoutes from "./routes/sesi.route.js";
 import laporanRoutes from "./routes/laporan.route.js";
-import JenisKomputer from './models/JenisKomputer.model.js';
-import Komputer from './models/Komputer.model.js';
-import Sesi from './models/Sesi.model.js';
-import Pengguna from './models/Pengguna.model.js';
+import JenisKomputer from "./models/JenisKomputer.model.js";
+import Komputer from "./models/Komputer.model.js";
+import Sesi from "./models/Sesi.model.js";
+import Pengguna from "./models/Pengguna.model.js";
+// PERBAIKAN: Impor model Transaksi
+import Transaksi from "./models/Transaksi.model.js";
 
 // Load environment variables
 dotenv.config();
@@ -31,12 +35,21 @@ app.get("/", (req, res) => {
 });
 
 // Definisikan relasi
-JenisKomputer.hasMany(Komputer, { foreignKey: 'jenisId' });
-Komputer.belongsTo(JenisKomputer, { foreignKey: 'jenisId' });
-Komputer.hasMany(Sesi, { foreignKey: 'komputerId' });
-Sesi.belongsTo(Komputer, { foreignKey: 'komputerId' });
-Pengguna.hasMany(Sesi, { foreignKey: 'penggunaId' });
-Sesi.belongsTo(Pengguna, { foreignKey: 'penggunaId' });
+JenisKomputer.hasMany(Komputer, { foreignKey: "jenisId" });
+Komputer.belongsTo(JenisKomputer, { foreignKey: "jenisId" });
+
+Komputer.hasMany(Sesi, { foreignKey: "komputerId" });
+Sesi.belongsTo(Komputer, { foreignKey: "komputerId" });
+
+Pengguna.hasMany(Sesi, { foreignKey: "penggunaId" });
+Sesi.belongsTo(Pengguna, { foreignKey: "penggunaId" });
+
+// PERBAIKAN: Menambahkan relasi untuk Transaksi
+Pengguna.hasMany(Transaksi, { foreignKey: "penggunaId" });
+Transaksi.belongsTo(Pengguna, { foreignKey: "penggunaId" });
+
+Sesi.hasMany(Transaksi, { foreignKey: "sesiId" });
+Transaksi.belongsTo(Sesi, { as: "sesi", foreignKey: "sesiId" });
 
 // Jalankan koneksi database sebelum server listen
 connectDB()

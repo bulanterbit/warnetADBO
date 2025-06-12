@@ -4,17 +4,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadProfile() {
   const profileDetails = document.getElementById("profile-details");
+  const welcomeMessage = document.getElementById("welcome-message");
+
   try {
     const user = await apiCall("/pengguna/profil");
 
     if (user) {
+      welcomeMessage.innerHTML = `<h3>Selamat Datang, ${user.nama}!</h3>`;
+
       profileDetails.innerHTML = `
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><strong>ID Pengguna:</strong> ${
                       user.id
-                    }</li>
-                    <li class="list-group-item"><strong>Nama:</strong> ${
-                      user.nama
                     }</li>
                     <li class="list-group-item"><strong>Username:</strong> ${
                       user.username

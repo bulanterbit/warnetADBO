@@ -1,60 +1,20 @@
-import Komputer from "../models/Komputer.model.js";
-import JenisKomputer from "../models/JenisKomputer.model.js";
+// warnetADBO/backend/controllers/pengguna.controller.js
 
-// --- Manajemen Jenis Komputer ---
-export const tambahJenisKomputer = async (req, res) => {
-  try {
-    const { nama, tarifPerMenit } = req.body;
-    const jenisBaru = await JenisKomputer.create({ nama, tarifPerMenit });
-    res.status(201).json(jenisBaru);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
-  }
-};
+import Pengguna from "../models/Pengguna.model.js";
+// PERBAIKAN: Impor model Transaksi dan instance sequelize untuk transaction
+import Transaksi from "../models/Transaksi.model.js";
+import { sequelize } from "../config/db.js";
 
-export const getAllJenisKomputer = async (req, res) => {
+// Fungsi getAllPengguna dan getProfilSaya tidak perlu diubah
+export const getAllPengguna = async (req, res) => {
   try {
-    const semuaJenis = await JenisKomputer.findAll();
-    res.status(200).json(semuaJenis);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
-  }
-};
-
-// --- Manajemen Komputer ---
-export const tambahKomputer = async (req, res) => {
-  try {
-    const { nama, jenisId } = req.body;
-    const komputerBaru = await Komputer.create({ nama, jenisId });
-    res.status(201).json(komputerBaru);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
-  }
-};
-
-export const getAllKomputer = async (req, res) => {
-  try {
-    const semuaKomputer = await Komputer.findAll({
-      include: {
-        model: JenisKomputer,
-        attributes: ["nama", "tarifPerMenit"],
+    const semuaPengguna = await Pengguna.findAll({
+      attributes: {
+        exclude: ["password"],
       },
+      order: [["nama", "ASC"]],
     });
-    res.status(200).json(semuaKomputer);
-  } catch (error) {
-    res.status(500).json({ message: "Server Error", error: error.message });
-  }
-};
-
-export const updateStatusKomputer = async (req, res) => {
-  try {
-    const { status } = req.body; // status: "Tersedia", "Digunakan", "Perbaikan"
-    const komputer = await Komputer.findByPk(req.params.id);
-    if (!komputer) {
-      return res.status(404).json({ message: "Komputer tidak ditemukan" });
-    }
-    await komputer.update({ status });
-    res.status(200).json(komputer);
+    res.status(200).json(semuaPengguna);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
@@ -62,7 +22,6 @@ export const updateStatusKomputer = async (req, res) => {
 
 export const getProfilSaya = async (req, res) => {
   try {
-    // req.pengguna di-set oleh middleware protect
     if (!req.pengguna) {
       return res.status(401).json({ message: "Tidak ada data pengguna" });
     }
@@ -78,24 +37,53 @@ export const getProfilSaya = async (req, res) => {
   }
 };
 
+// PERBAIKAN: Logika topUpSaldo dirombak total
 export const topUpSaldo = async (req, res) => {
+  // Memulai transaksi database
+  const t = await sequelize.transaction();
+
   try {
     const { jumlah } = req.body;
-    const pengguna = await req.pengguna.constructor.findByPk(req.params.id);
+    const pengguna = await Pengguna.findByPk(req.params.id);
 
     if (!pengguna) {
       return res.status(404).json({ message: "Pengguna tidak ditemukan" });
     }
 
-    await pengguna.increment("saldo", { by: jumlah });
+    const jumlahNumeric = parseFloat(jumlah);
+    if (isNaN(jumlahNumeric) || jumlahNumeric <= 0) {
+      return res.status(400).json({ message: "Jumlah top up tidak valid." });
+    }
+
+    // 1. Tambahkan saldo di dalam transaksi
+    await pengguna.increment("saldo", { by: jumlahNumeric, transaction: t });
+
+    // 2. Catat ke tabel Transaksi di dalam transaksi yang sama
+    await Transaksi.create(
+      {
+        jumlah: jumlahNumeric,
+        tipe: "TOPUP",
+        penggunaId: pengguna.id,
+        // sesiId dibiarkan null karena ini bukan transaksi dari sesi billing
+      },
+      { transaction: t }
+    );
+
+    // 3. Jika semua berhasil, commit transaksi
+    await t.commit();
+
+    // 4. Reload data pengguna untuk mendapatkan saldo terbaru dari database
+    await pengguna.reload();
 
     res.status(200).json({
-      message: `Saldo berhasil ditambah sebesar ${jumlah}`,
-      saldoBaru: pengguna.saldo + Number(jumlah),
+      message: `Saldo untuk ${
+        pengguna.nama
+      } berhasil ditambah sebesar Rp${jumlahNumeric.toLocaleString("id-ID")}`,
+      saldoBaru: pengguna.saldo, // Kirim saldo yang sudah di-reload
     });
   } catch (error) {
+    // 5. Jika terjadi error, batalkan semua perubahan (rollback)
+    await t.rollback();
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
-// ...export fungsi lain seperti ...

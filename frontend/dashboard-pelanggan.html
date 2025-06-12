@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil Saya</title>
+    <title>Dashboard Pelanggan - VictoryNet</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
@@ -13,7 +14,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Profil Pelanggan</a>
+            <a class="navbar-brand" href="#">VictoryNet</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -27,21 +28,66 @@
         </div>
     </nav>
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card">
+    <div class="container mt-4">
+        <div id="welcome-message" class="mb-4">
+        </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card h-100">
                     <div class="card-header">
-                        <h3>Informasi Akun</h3>
+                        <h4><i class="bi bi-person-circle"></i> Informasi Akun</h4>
                     </div>
                     <div class="card-body" id="profile-details">
                         <p>Memuat data...</p>
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-5">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h4><i class="bi bi-lightning-fill"></i> Aksi Cepat</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Pilih aksi yang ingin Anda lakukan.</p>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#topUpInfoModal">
+                                <i class="bi bi-wallet-fill"></i> Top Up Saldo
+                            </button>
+                            <button class="btn btn-info" disabled title="Fitur ini dalam pengembangan">
+                                <i class="bi bi-clock-history"></i> Lihat Riwayat Sesi
+                            </button>
+                            <button class="btn btn-secondary" disabled title="Fitur ini dalam pengembangan">
+                                <i class="bi bi-pencil-square"></i> Edit Profil
+                            </button>
+                        </div>
+                        <small class="d-block text-muted mt-3">*Fitur "Lihat Riwayat" dan "Edit Profil" memerlukan
+                            pembaruan pada backend.</small>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <div class="modal fade" id="topUpInfoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Informasi Top Up Saldo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Sesuai dengan alur sistem, pengisian saldo (Top Up) hanya dapat dilakukan oleh Operator.</p>
+                    <p><strong>Silakan hubungi Operator di kasir untuk menambahkan saldo ke akun Anda.</strong></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Mengerti</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/pelanggan.js"></script>
 </body>

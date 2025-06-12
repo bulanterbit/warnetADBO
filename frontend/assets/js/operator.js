@@ -33,32 +33,40 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadAllData() {
+  // PERBAIKAN: Urutan pemanggilan diubah. Sesi aktif harus dimuat sebelum komputer.
   await loadJenisKomputer();
-  await loadKomputer();
   await loadPengguna();
+  await loadActiveSessions(); // Muat sesi aktif dari backend
+  await loadKomputer(); // Baru muat komputer setelah state sesi diketahui
+}
+
+// PERBAIKAN: Fungsi baru untuk mengambil sesi aktif dari backend
+async function loadActiveSessions() {
+  try {
+    const sessions = await apiCall("/sesi/aktif");
+    activeSessions = {}; // Kosongkan state lama
+    for (const sesi of sessions) {
+      activeSessions[sesi.komputerId] = sesi.id;
+    }
+    console.log("Sesi aktif berhasil dimuat:", activeSessions);
+  } catch (error) {
+    alert(
+      "Gagal memuat data sesi aktif. Beberapa tombol mungkin tidak berfungsi."
+    );
+    console.error("Gagal memuat sesi aktif:", error);
+  }
 }
 
 // --- DATA LOADING FUNCTIONS ---
 async function loadKomputer() {
   const komputerList = document.getElementById("komputer-list");
-  komputerList.innerHTML = "<p>Memuat komputer...</p>";
+  komputerList.innerHTML =
+    '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>';
   try {
     const komputers = await apiCall("/komputer");
-    // A real app would get active sessions from an endpoint like GET /sesi/aktif
-    // Here, we simulate by finding sessions with status "Digunakan"
-    const sessions = await apiCall("/sesi");
-    activeSessions = {};
-    if (sessions && Array.isArray(sessions)) {
-      sessions
-        .filter((s) => s.status === "Aktif")
-        .forEach((s) => {
-          activeSessions[s.komputerId] = s.id;
-        });
-    }
-
     renderKomputerList(komputers);
   } catch (error) {
-    komputerList.innerHTML = `<p class="text-danger">Gagal memuat data komputer: ${error.message}</p>`;
+    komputerList.innerHTML = `<div class="alert alert-danger">Gagal memuat data komputer: ${error.message}</div>`;
   }
 }
 
@@ -75,16 +83,19 @@ async function loadJenisKomputer() {
 }
 
 async function loadPengguna() {
-  // NOTE: This assumes an endpoint GET /api/pengguna exists to fetch all users.
-  // You will need to add this to your backend for this feature to work.
+  // NOTE: This assumes an endpoint GET /api/pengguna/all exists to fetch all users.
+  // This is required for the "Top Up" and "Start Session" features.
   try {
-    allUsers = await apiCall("/pengguna/all"); // Assumed endpoint
+    // This is a hypothetical endpoint. You must add it to your backend.
+    // In pengguna.route.js, add: router.get('/all', protect, isOperator, getAllPengguna);
+    // In pengguna.controller.js, add a new 'getAllPengguna' function.
+    allUsers = await apiCall("/pengguna/all");
     renderPenggunaList(allUsers);
     populatePelangganDropdown();
   } catch (error) {
     document.getElementById(
       "pengguna-list"
-    ).innerHTML = `<tr><td colspan="6" class="text-danger">Gagal memuat pengguna: ${error.message}. Pastikan endpoint GET /api/pengguna/all ada.</td></tr>`;
+    ).innerHTML = `<tr><td colspan="6" class="text-danger">Gagal memuat pengguna: ${error.message}. <br><strong>PENTING:</strong> Pastikan endpoint GET /api/pengguna/all ada di backend Anda dan hanya bisa diakses oleh Operator.</td></tr>`;
   }
 }
 
@@ -92,7 +103,8 @@ async function loadPengguna() {
 function renderKomputerList(komputers) {
   const komputerList = document.getElementById("komputer-list");
   if (!komputers || komputers.length === 0) {
-    komputerList.innerHTML = "<p>Belum ada komputer yang ditambahkan.</p>";
+    komputerList.innerHTML =
+      '<p class="text-muted">Belum ada komputer yang ditambahkan.</p>';
     return;
   }
 
@@ -112,15 +124,18 @@ function renderKomputerList(komputers) {
       if (k.status === "Tersedia") {
         actionButton = `<button class="btn btn-sm btn-success start-sesi-btn" data-komputer-id="${k.id}">Mulai Sesi</button>`;
       } else if (k.status === "Digunakan") {
+        // Get session ID from our tracked state
         const sessionId = activeSessions[k.id];
         if (sessionId) {
           actionButton = `<button class="btn btn-sm btn-danger stop-sesi-btn" data-sesi-id="${sessionId}">Stop Sesi</button>`;
+        } else {
+          actionButton = `<button class="btn btn-sm btn-secondary" disabled>Loading Sesi...</button>`;
         }
       }
 
       return `
         <div class="col-md-4 col-lg-3 mb-4">
-            <div class="card komputer-card h-100">
+            <div class="card komputer-card h-100 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">${k.nama}</h5>
@@ -128,7 +143,7 @@ function renderKomputerList(komputers) {
         statusInfo.icon
       }"></i> ${k.status}</span>
                     </div>
-                    <p class="card-text text-muted">${
+                    <p class="card-text text-muted small">${
                       k.JenisKomputer.nama
                     } - Rp ${parseFloat(
         k.JenisKomputer.tarifPerMenit
@@ -157,6 +172,7 @@ function renderKomputerList(komputers) {
     .join("");
 }
 
+// ... (The rest of the rendering functions like renderJenisList, renderPenggunaList remain the same)
 function renderJenisList(jenis) {
   const jenisList = document.getElementById("jenis-list");
   if (!jenis || jenis.length === 0) {
@@ -191,7 +207,7 @@ function renderPenggunaList(users) {
             <td>${u.nama}</td>
             <td>${u.username}</td>
             <td><span class="badge ${
-              u.role === "Operator" ? "bg-info" : "bg-secondary"
+              u.role === "Operator" ? "bg-info text-dark" : "bg-secondary"
             }">${u.role}</span></td>
             <td>Rp ${parseFloat(u.saldo).toLocaleString("id-ID")}</td>
             <td>
@@ -217,6 +233,7 @@ function populateJenisDropdown() {
 
 function populatePelangganDropdown() {
   const select = document.getElementById("sesi-pelanggan");
+  if (!allUsers) return;
   const pelanggan = allUsers.filter((u) => u.role === "Pelanggan");
   select.innerHTML = pelanggan
     .map(
@@ -267,7 +284,16 @@ async function handleStartSesi(e) {
   const idPelanggan = document.getElementById("sesi-pelanggan").value;
 
   try {
-    await apiCall("/sesi/mulai", "POST", { idKomputer, idPelanggan });
+    const newSession = await apiCall("/sesi/mulai", "POST", {
+      idKomputer,
+      idPelanggan,
+    });
+
+    // **IMPROVEMENT**: Track the new session ID locally
+    if (newSession && newSession.data) {
+      activeSessions[idKomputer] = newSession.data.id;
+    }
+
     bootstrap.Modal.getInstance(
       document.getElementById("startSesiModal")
     ).hide();
@@ -285,7 +311,8 @@ async function handleTopUp(e) {
     await apiCall(`/pengguna/${userId}/topup`, "POST", { jumlah });
     bootstrap.Modal.getInstance(document.getElementById("topUpModal")).hide();
     e.target.reset();
-    await loadPengguna(); // Refresh list
+    await loadPengguna(); // Refresh user list to show new saldo
+    await populatePelangganDropdown(); // Refresh dropdown for start session
   } catch (error) {
     alert(`Gagal top up: ${error.message}`);
   }
@@ -296,12 +323,12 @@ async function handleGenerateReport() {
   resultsDiv.innerHTML = "Generating...";
   try {
     const report = await apiCall("/laporan/harian", "POST");
-    resultsDiv.innerHTML = `<div class="alert alert-success">
+    resultsDiv.innerHTML = `<div class="alert alert-success mt-3">
             <h5>Laporan Harian - ${report.periode}</h5>
-            <pre>${JSON.stringify(report.data, null, 2)}</pre>
+            <pre class="mb-0">${JSON.stringify(report.data, null, 2)}</pre>
         </div>`;
   } catch (error) {
-    resultsDiv.innerHTML = `<div class="alert alert-danger">Gagal membuat laporan: ${error.message}</div>`;
+    resultsDiv.innerHTML = `<div class="alert alert-danger mt-3">Gagal membuat laporan: ${error.message}</div>`;
   }
 }
 
@@ -352,8 +379,20 @@ function handlePenggunaAction(e) {
 async function stopSesi(idSesi) {
   try {
     const result = await apiCall("/sesi/stop", "POST", { idSesi });
-    alert(`Sesi dihentikan. Biaya: Rp ${result.biaya.toLocaleString("id-ID")}`);
-    await loadKomputer(); // Refresh
+    // **IMPROVEMENT**: Clear the session from local tracking
+    for (const compId in activeSessions) {
+      if (activeSessions[compId] === parseInt(idSesi)) {
+        delete activeSessions[compId];
+        break;
+      }
+    }
+    alert(
+      `Sesi dihentikan.\nDurasi: ${
+        result.durasi
+      }\nBiaya: Rp ${result.biaya.toLocaleString("id-ID")}`
+    );
+    await loadKomputer(); // Refresh computer list
+    await loadPengguna(); // Refresh user list to show updated saldo
   } catch (error) {
     alert(`Gagal menghentikan sesi: ${error.message}`);
   }
