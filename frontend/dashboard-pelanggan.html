@@ -7,81 +7,270 @@
     <title>Dashboard Pelanggan - VictoryNet</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            font-weight: 600;
+            padding: 1.5rem;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .btn {
+            border-radius: 15px;
+            font-weight: 600;
+            padding: 12px 24px;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(86, 171, 47, 0.4);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #757f9a, #d7dde8);
+            color: white;
+        }
+
+        .btn-outline-light {
+            border: 2px solid white;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-outline-light:hover {
+            background-color: white;
+            color: #667eea;
+        }
+
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 1.5rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.3));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .info-item {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .balance-highlight {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .d-grid .btn {
+            margin-bottom: 10px;
+        }
+
+        .icon-large {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+
+        .container {
+            margin-top: 2rem;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            border: none;
+            border-radius: 15px;
+            color: #0e2e36;
+        }
+    </style>
 </head>
 
 <body>
-
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">VictoryNet</a>
+            <a class="navbar-brand" href="#"><i class="bi bi-wifi"></i> VictoryNet</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <button id="logout-btn" class="btn btn-outline-light">Logout</button>
+                        <button id="logout-btn" class="btn btn-outline-light">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
+    <div class="container">
         <div id="welcome-message" class="mb-4">
+            <!-- Welcome message will be loaded here -->
         </div>
-        <div class="row">
-            <div class="col-md-7">
+
+        <div class="row g-4">
+            <div class="col-lg-8">
                 <div class="card h-100">
                     <div class="card-header">
-                        <h4><i class="bi bi-person-circle"></i> Informasi Akun</h4>
+                        <h4 class="mb-0"><i class="bi bi-person-circle icon-large"></i> Informasi Akun</h4>
                     </div>
                     <div class="card-body" id="profile-details">
-                        <p>Memuat data...</p>
+                        <div class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Memuat data...</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-5">
+            <div class="col-lg-4">
                 <div class="card h-100">
                     <div class="card-header">
-                        <h4><i class="bi bi-lightning-fill"></i> Aksi Cepat</h4>
+                        <h4 class="mb-0"><i class="bi bi-lightning-fill icon-large"></i> Aksi Cepat</h4>
                     </div>
                     <div class="card-body">
-                        <p>Pilih aksi yang ingin Anda lakukan.</p>
-                        <div class="d-grid gap-2">
+                        <p class="text-muted mb-4">Pilih aksi yang ingin Anda lakukan.</p>
+                        <div class="d-grid gap-3">
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#topUpInfoModal">
-                                <i class="bi bi-wallet-fill"></i> Top Up Saldo
+                                <i class="bi bi-wallet-fill icon-large"></i> Top Up Saldo
                             </button>
-                            <button class="btn btn-info" disabled title="Fitur ini dalam pengembangan">
-                                <i class="bi bi-clock-history"></i> Lihat Riwayat Sesi
+                            <!-- <button class="btn btn-info" disabled>
+                                <i class="bi bi-clock-history icon-large"></i> Lihat Riwayat Sesi
                             </button>
-                            <button class="btn btn-secondary" disabled title="Fitur ini dalam pengembangan">
-                                <i class="bi bi-pencil-square"></i> Edit Profil
-                            </button>
+                            <button class="btn btn-secondary" disabled>
+                                <i class="bi bi-pencil-square icon-large"></i> Edit Profil
+                            </button> -->
                         </div>
-                        <small class="d-block text-muted mt-3">*Fitur "Lihat Riwayat" dan "Edit Profil" memerlukan
-                            pembaruan pada backend.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Row -->
+        <div class="row g-4 mt-2">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-clock text-primary" style="font-size: 2rem;"></i>
+                        <h5 class="mt-2">Sesi Aktif</h5>
+                        <p class="text-muted">Status sesi billing Anda</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-graph-up text-success" style="font-size: 2rem;"></i>
+                        <h5 class="mt-2">Aktivitas</h5>
+                        <p class="text-muted">Riwayat penggunaan</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-shield-check text-info" style="font-size: 2rem;"></i>
+                        <h5 class="mt-2">Keamanan</h5>
+                        <p class="text-muted">Akun terverifikasi</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Top Up Info Modal -->
     <div class="modal fade" id="topUpInfoModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Informasi Top Up Saldo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title"><i class="bi bi-info-circle icon-large"></i> Informasi Top Up Saldo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Sesuai dengan alur sistem, pengisian saldo (Top Up) hanya dapat dilakukan oleh Operator.</p>
-                    <p><strong>Silakan hubungi Operator di kasir untuk menambahkan saldo ke akun Anda.</strong></p>
+                    <div class="alert alert-info">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <strong>Penting!</strong> Sesuai dengan alur sistem, pengisian saldo (Top Up) hanya dapat
+                        dilakukan oleh Operator.
+                    </div>
+                    <div class="text-center p-3">
+                        <i class="bi bi-person-badge" style="font-size: 3rem; color: #667eea;"></i>
+                        <h5 class="mt-3">Hubungi Operator</h5>
+                        <p class="text-muted">Silakan hubungi Operator di kasir untuk menambahkan saldo ke akun Anda.
+                        </p>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Mengerti</button>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                        <i class="bi bi-check-circle"></i> Mengerti
+                    </button>
                 </div>
             </div>
         </div>

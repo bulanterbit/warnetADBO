@@ -311,8 +311,8 @@ async function handleTopUp(e) {
     await apiCall(`/pengguna/${userId}/topup`, "POST", { jumlah });
     bootstrap.Modal.getInstance(document.getElementById("topUpModal")).hide();
     e.target.reset();
-    await loadPengguna(); // Refresh user list to show new saldo
-    await populatePelangganDropdown(); // Refresh dropdown for start session
+    await loadPengguna();
+    await populatePelangganDropdown();
   } catch (error) {
     alert(`Gagal top up: ${error.message}`);
   }
